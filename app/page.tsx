@@ -8,6 +8,9 @@ export default function Home() {
   const [travelMethod, setTravelMethod] = useState("walking");
   const [needsQuiet, setNeedsQuiet] = useState(false);
   const [needsPower, setNeedsPower] = useState(false);
+  const [filteredPlaceList, setFilteredPlaceList] = useState<Place[] | null>(
+    null,
+  );
 
   type Place = {
     id: string;
@@ -38,6 +41,24 @@ export default function Home() {
       quietRating: 4,
       powerAvailable: true,
     },
+    {
+      id: "pidoaskd123098721",
+      name: "Sæter Cafe",
+      type: "cafe",
+      travelMinutes: 15,
+      travelMethod: "bus",
+      quietRating: 2,
+      powerAvailable: false,
+    },
+    {
+      id: "pidoaskd0kj98721",
+      name: "Lambertseter Bibliotek",
+      type: "library",
+      travelMinutes: 20,
+      travelMethod: "bus",
+      quietRating: 4,
+      powerAvailable: true,
+    },
   ];
 
   function onFilterPlaces(event: React.SubmitEvent) {
@@ -46,6 +67,63 @@ export default function Home() {
     console.log("maxTravelMinutes: " + maxTravelMinutes);
     console.log("needsQuiet: " + needsQuiet);
     console.log("needsPower: " + needsPower);
+
+    const filterPlaces = places.filter((place) => {
+      return place.powerAvailable === needsPower;
+    });
+
+    console.log(filterPlaces);
+
+    setFilteredPlaceList(filterPlaces);
+  }
+
+  function renderPlaces(placeList: Place[]) {
+    return placeList.map((place) => (
+      <li key={place.id}>
+        <p>
+          <b>ID: </b>
+          {place.id}
+        </p>
+        <p>
+          <b>Name: </b>
+          {place.name}
+        </p>
+        <p>
+          <b>Type: </b>
+          {place.type}
+        </p>
+        <p>
+          <b>Quiet Rating: </b>
+          {place.quietRating}/5
+        </p>
+        <p>
+          <b>Travel Method: </b>
+          {place.travelMethod}
+        </p>
+        <p>
+          <b>Travel Minutes: </b>
+          {place.travelMinutes}
+        </p>
+        <p>
+          <b>Power Avalable: </b>
+          {place.powerAvailable ? "true" : "false"}
+        </p>
+      </li>
+    ));
+  }
+
+  let filterResult;
+
+  if (filteredPlaceList === null) {
+    filterResult = renderPlaces(places);
+  }
+
+  if (filteredPlaceList !== null && filteredPlaceList.length > 0) {
+    filterResult = renderPlaces(filteredPlaceList);
+  }
+
+  if (filteredPlaceList !== null && filteredPlaceList.length === 0) {
+    filterResult = <p>No matches for filter</p>;
   }
 
   return (
@@ -112,40 +190,7 @@ export default function Home() {
           />
           <input type="submit" value="Find places" />
         </form>
-        <ul>
-          {places.map((place) => (
-            <li key={place.id}>
-              <p>
-                <b>ID: </b>
-                {place.id}
-              </p>
-              <p>
-                <b>Name: </b>
-                {place.name}
-              </p>
-              <p>
-                <b>Type: </b>
-                {place.type}
-              </p>
-              <p>
-                <b>Quiet Rating: </b>
-                {place.quietRating}/5
-              </p>
-              <p>
-                <b>Travel Method: </b>
-                {place.travelMethod}
-              </p>
-              <p>
-                <b>Travel Minutes: </b>
-                {place.travelMinutes}
-              </p>
-              <p>
-                <b>Power Avalable: </b>
-                {place.powerAvailable ? "true" : "false"}
-              </p>
-            </li>
-          ))}
-        </ul>
+        <ul>{filterResult}</ul>
       </main>
     </div>
   );

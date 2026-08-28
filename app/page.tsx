@@ -2,64 +2,77 @@
 
 import { useState } from "react";
 
+const defaultFilterValues = {
+  placeType: "cafe",
+  maxTravelMinutes: 30,
+  travelMethod: "walking",
+  needsQuiet: false,
+  needsPower: false,
+  filteredPlaceList: null,
+};
+
+type Place = {
+  id: string;
+  name: string;
+  type: "cafe" | "library" | "outdoor" | "add new ...";
+  travelMinutes: number;
+  travelMethod: "walking" | "bus" | "train" | "add new ...";
+  quietRating: 1 | 2 | 3 | 4 | 5;
+  powerAvailable: boolean;
+};
+
+const places: Place[] = [
+  {
+    id: "123213ojpjdasda",
+    name: "Kolbotn Espresso House",
+    type: "cafe",
+    travelMinutes: 30,
+    travelMethod: "walking",
+    quietRating: 2,
+    powerAvailable: true,
+  },
+  {
+    id: "pidoaskd098721",
+    name: "Kolben Bibliotek",
+    type: "library",
+    travelMinutes: 30,
+    travelMethod: "walking",
+    quietRating: 4,
+    powerAvailable: true,
+  },
+  {
+    id: "pidoaskd123098721",
+    name: "Sæter Cafe",
+    type: "cafe",
+    travelMinutes: 15,
+    travelMethod: "bus",
+    quietRating: 2,
+    powerAvailable: false,
+  },
+  {
+    id: "pidoaskd0kj98721",
+    name: "Lambertseter Bibliotek",
+    type: "library",
+    travelMinutes: 20,
+    travelMethod: "bus",
+    quietRating: 4,
+    powerAvailable: true,
+  },
+];
+
 export default function Home() {
-  const [placeType, setPlaceType] = useState("cafe");
-  const [maxTravelMinutes, setMaxTravelMinutes] = useState(30);
-  const [travelMethod, setTravelMethod] = useState("walking");
-  const [needsQuiet, setNeedsQuiet] = useState(false);
-  const [needsPower, setNeedsPower] = useState(false);
-  const [filteredPlaceList, setFilteredPlaceList] = useState<Place[] | null>(
-    null,
+  const [placeType, setPlaceType] = useState(defaultFilterValues.placeType);
+  const [maxTravelMinutes, setMaxTravelMinutes] = useState(
+    defaultFilterValues.maxTravelMinutes,
   );
-
-  type Place = {
-    id: string;
-    name: string;
-    type: "cafe" | "library" | "outdoor" | "add new ...";
-    travelMinutes: number;
-    travelMethod: "walking" | "bus" | "train" | "add new ...";
-    quietRating: 1 | 2 | 3 | 4 | 5;
-    powerAvailable: boolean;
-  };
-
-  const places: Place[] = [
-    {
-      id: "123213ojpjdasda",
-      name: "Kolbotn Espresso House",
-      type: "cafe",
-      travelMinutes: 30,
-      travelMethod: "walking",
-      quietRating: 2,
-      powerAvailable: true,
-    },
-    {
-      id: "pidoaskd098721",
-      name: "Kolben Bibliotek",
-      type: "library",
-      travelMinutes: 30,
-      travelMethod: "walking",
-      quietRating: 4,
-      powerAvailable: true,
-    },
-    {
-      id: "pidoaskd123098721",
-      name: "Sæter Cafe",
-      type: "cafe",
-      travelMinutes: 15,
-      travelMethod: "bus",
-      quietRating: 2,
-      powerAvailable: false,
-    },
-    {
-      id: "pidoaskd0kj98721",
-      name: "Lambertseter Bibliotek",
-      type: "library",
-      travelMinutes: 20,
-      travelMethod: "bus",
-      quietRating: 4,
-      powerAvailable: true,
-    },
-  ];
+  const [travelMethod, setTravelMethod] = useState(
+    defaultFilterValues.travelMethod,
+  );
+  const [needsQuiet, setNeedsQuiet] = useState(defaultFilterValues.needsQuiet);
+  const [needsPower, setNeedsPower] = useState(defaultFilterValues.needsPower);
+  const [filteredPlaceList, setFilteredPlaceList] = useState<Place[] | null>(
+    defaultFilterValues.filteredPlaceList,
+  );
 
   function onFilterPlaces(event: React.SubmitEvent) {
     event.preventDefault();
@@ -75,6 +88,15 @@ export default function Home() {
     console.log(filterPlaces);
 
     setFilteredPlaceList(filterPlaces);
+  }
+
+  function clearFilterAndResetList() {
+    setPlaceType(defaultFilterValues.placeType);
+    setMaxTravelMinutes(defaultFilterValues.maxTravelMinutes);
+    setTravelMethod(defaultFilterValues.travelMethod);
+    setNeedsQuiet(defaultFilterValues.needsQuiet);
+    setNeedsPower(defaultFilterValues.needsPower);
+    setFilteredPlaceList(defaultFilterValues.filteredPlaceList);
   }
 
   function renderPlaces(placeList: Place[]) {
@@ -134,7 +156,7 @@ export default function Home() {
         <form onSubmit={onFilterPlaces}>
           <label htmlFor="quietCheckbox">Quiet</label>
           <input
-            defaultChecked={needsQuiet}
+            checked={needsQuiet}
             name="quietCheckbox"
             id="quietCheckbox"
             type="checkbox"
@@ -142,7 +164,7 @@ export default function Home() {
           />
           <label htmlFor="powerCheckbox">Power</label>
           <input
-            defaultChecked={needsPower}
+            checked={needsPower}
             name="powerCheckbox"
             id="powerCheckbox"
             type="checkbox"
@@ -151,7 +173,7 @@ export default function Home() {
           {/* TODO: Koble dette sammen med hva som er i typescript */}
           <label htmlFor="typeDropdown">Choose type of place:</label>
           <select
-            defaultValue={placeType}
+            value={placeType}
             name="typeDropdown"
             id="typeDropdown"
             onChange={(e) => setPlaceType(e.target.value)}
@@ -163,7 +185,7 @@ export default function Home() {
           </select>
           <label htmlFor="travelMethodDropdown">Choose travel method:</label>
           <select
-            defaultValue={travelMethod}
+            value={travelMethod}
             name="travelMethodDropdown"
             id="travelMethodDropdown"
             onChange={(e) => setTravelMethod(e.target.value)}
@@ -180,7 +202,7 @@ export default function Home() {
             name="maxTravelTimeInput"
             id="maxTravelTimeInput"
             type="number"
-            defaultValue={maxTravelMinutes}
+            value={maxTravelMinutes}
             onKeyDown={(e) => {
               if (["e", "E", "+", "-"].includes(e.key)) {
                 e.preventDefault();
@@ -190,6 +212,9 @@ export default function Home() {
           />
           <input type="submit" value="Find places" />
         </form>
+        <button type="button" onClick={clearFilterAndResetList}>
+          Clear filter
+        </button>
         <ul>{filterResult}</ul>
       </main>
     </div>

@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const defaultFilterValues = {
   placeType: "cafe",
-  maxTravelMinutes: 30,
+  maxTravelMinutes: 120,
   travelMethod: "walking",
   needsQuiet: false,
   needsPower: false,
@@ -58,6 +58,96 @@ const places: Place[] = [
     quietRating: 4,
     powerAvailable: true,
   },
+  {
+    id: "place-005",
+    name: "Fjordgløtt Kafé",
+    type: "cafe",
+    travelMinutes: 10,
+    travelMethod: "walking",
+    quietRating: 4,
+    powerAvailable: false,
+  },
+  {
+    id: "place-006",
+    name: "Sentrum Study Hall",
+    type: "library",
+    travelMinutes: 25,
+    travelMethod: "train",
+    quietRating: 5,
+    powerAvailable: true,
+  },
+  {
+    id: "place-007",
+    name: "Parkpaviljongen",
+    type: "outdoor",
+    travelMinutes: 12,
+    travelMethod: "walking",
+    quietRating: 3,
+    powerAvailable: false,
+  },
+  {
+    id: "place-008",
+    name: "Nordstasjonen Kafé",
+    type: "cafe",
+    travelMinutes: 20,
+    travelMethod: "train",
+    quietRating: 1,
+    powerAvailable: true,
+  },
+  {
+    id: "place-009",
+    name: "Elvebredden Bibliotek",
+    type: "library",
+    travelMinutes: 35,
+    travelMethod: "bus",
+    quietRating: 5,
+    powerAvailable: true,
+  },
+  {
+    id: "place-010",
+    name: "Hagekontoret",
+    type: "outdoor",
+    travelMinutes: 15,
+    travelMethod: "bus",
+    quietRating: 4,
+    powerAvailable: false,
+  },
+  {
+    id: "place-011",
+    name: "Hjørnet Kaffebar",
+    type: "cafe",
+    travelMinutes: 25,
+    travelMethod: "bus",
+    quietRating: 3,
+    powerAvailable: true,
+  },
+  {
+    id: "place-012",
+    name: "Utsikten Bibliotek",
+    type: "library",
+    travelMinutes: 40,
+    travelMethod: "walking",
+    quietRating: 5,
+    powerAvailable: false,
+  },
+  {
+    id: "place-013",
+    name: "Perrongen Kafé",
+    type: "cafe",
+    travelMinutes: 45,
+    travelMethod: "train",
+    quietRating: 2,
+    powerAvailable: false,
+  },
+  {
+    id: "place-014",
+    name: "Skogly Arbeidsplass",
+    type: "outdoor",
+    travelMinutes: 20,
+    travelMethod: "walking",
+    quietRating: 4,
+    powerAvailable: false,
+  },
 ];
 
 export default function Home() {
@@ -76,18 +166,25 @@ export default function Home() {
 
   function onFilterPlaces(event: React.SubmitEvent) {
     event.preventDefault();
-    console.log("placeType: " + placeType);
-    console.log("maxTravelMinutes: " + maxTravelMinutes);
-    console.log("needsQuiet: " + needsQuiet);
-    console.log("needsPower: " + needsPower);
 
-    const filterPlaces = places.filter((place) => {
-      return place.powerAvailable === needsPower;
+    const filteredPlaces = places.filter((place) => {
+      const matchesPlaceType = place.type === placeType;
+      const matchesMaxTravelMinutes = place.travelMinutes <= maxTravelMinutes;
+      const matchesTravelMethod = place.travelMethod === travelMethod;
+      // TODO: Dette fungerer slik at det er enten eller. Senere må vi gi en tredje option, som er "ignorer option" eller "enten eller"
+      const matchesQuiet = needsQuiet === place.quietRating >= 4;
+      const matchesPower = needsPower === place.powerAvailable;
+
+      return (
+        matchesPlaceType &&
+        matchesMaxTravelMinutes &&
+        matchesTravelMethod &&
+        matchesQuiet &&
+        matchesPower
+      );
     });
 
-    console.log(filterPlaces);
-
-    setFilteredPlaceList(filterPlaces);
+    setFilteredPlaceList(filteredPlaces);
   }
 
   function clearFilterAndResetList() {
@@ -170,7 +267,7 @@ export default function Home() {
             type="checkbox"
             onChange={(e) => setNeedsPower(e.target.checked)}
           />
-          {/* TODO: Koble dette sammen med hva som er i typescript */}
+          {/* TODO : Koble dette sammen med hva som er i typescript */}
           <label htmlFor="typeDropdown">Choose type of place:</label>
           <select
             value={placeType}
@@ -180,8 +277,8 @@ export default function Home() {
           >
             <option value="cafe">Cafe</option>
             <option value="library">Library</option>
-            <option value="outside">Outside</option>
-            <option value="addNew">Add new ...</option>
+            <option value="outdoor">Outside</option>
+            <option value="add new ...">Add new ...</option>
           </select>
           <label htmlFor="travelMethodDropdown">Choose travel method:</label>
           <select
@@ -193,8 +290,11 @@ export default function Home() {
             <option value="walking">Walking</option>
             <option value="bus">Bus</option>
             <option value="train">Train</option>
-            <option value="addNew">Add new ...</option>
+            <option value="add new ...">Add new ...</option>
           </select>
+          {/* TODO: Skru default travel time til mye mer, eller gi evne til å skru av å søke på traveltime.
+              Grunnen til dette er UX. Hvis brukeren ikke tenker på å søke med traveltime, så burde han/hun ikke trenge å justere på det.
+          */}
           <label htmlFor="maxTravelTimeInput">
             Maximum travel time in minutes
           </label>

@@ -2,10 +2,26 @@
 
 import { useState } from "react";
 
+const placeTypeOptions = [
+  { value: "cafe", label: "Cafe" },
+  { value: "library", label: "Library" },
+  { value: "outdoor", label: "Outside" },
+] as const;
+
+type PlaceType = (typeof placeTypeOptions)[number]["value"];
+
+const travelMethodOptions = [
+  { value: "walking", label: "Walking" },
+  { value: "bus", label: "Bus" },
+  { value: "train", label: "Train" },
+] as const;
+
+type TravelMethod = (typeof travelMethodOptions)[number]["value"];
+
 const defaultFilterValues = {
-  placeType: "cafe",
+  placeType: placeTypeOptions[0].value,
   maxTravelMinutes: 120,
-  travelMethod: "walking",
+  travelMethod: travelMethodOptions[0].value,
   needsQuiet: false,
   needsPower: false,
   filteredPlaceList: null,
@@ -14,9 +30,9 @@ const defaultFilterValues = {
 type Place = {
   id: string;
   name: string;
-  type: "cafe" | "library" | "outdoor" | "add new ...";
+  type: PlaceType;
   travelMinutes: number;
-  travelMethod: "walking" | "bus" | "train" | "add new ...";
+  travelMethod: TravelMethod;
   quietRating: 1 | 2 | 3 | 4 | 5;
   powerAvailable: boolean;
 };
@@ -151,11 +167,13 @@ const places: Place[] = [
 ];
 
 export default function Home() {
-  const [placeType, setPlaceType] = useState(defaultFilterValues.placeType);
+  const [placeType, setPlaceType] = useState<PlaceType>(
+    defaultFilterValues.placeType,
+  );
   const [maxTravelMinutes, setMaxTravelMinutes] = useState(
     defaultFilterValues.maxTravelMinutes,
   );
-  const [travelMethod, setTravelMethod] = useState(
+  const [travelMethod, setTravelMethod] = useState<TravelMethod>(
     defaultFilterValues.travelMethod,
   );
   const [needsQuiet, setNeedsQuiet] = useState(defaultFilterValues.needsQuiet);
@@ -171,8 +189,7 @@ export default function Home() {
       const matchesPlaceType = place.type === placeType;
       const matchesMaxTravelMinutes = place.travelMinutes <= maxTravelMinutes;
       const matchesTravelMethod = place.travelMethod === travelMethod;
-      // TODO: Dette fungerer slik at det er enten eller. Senere må vi gi en tredje option, som er "ignorer option" eller "enten eller"
-      const matchesQuiet = needsQuiet === place.quietRating >= 4;
+      const matchesQuiet = needsQuiet === (place.quietRating >= 4);
       const matchesPower = needsPower === place.powerAvailable;
 
       return (
@@ -267,34 +284,34 @@ export default function Home() {
             type="checkbox"
             onChange={(e) => setNeedsPower(e.target.checked)}
           />
-          {/* TODO : Koble dette sammen med hva som er i typescript */}
           <label htmlFor="typeDropdown">Choose type of place:</label>
           <select
             value={placeType}
             name="typeDropdown"
             id="typeDropdown"
-            onChange={(e) => setPlaceType(e.target.value)}
+            onChange={(e) => setPlaceType(e.target.value as PlaceType)}
           >
-            <option value="cafe">Cafe</option>
-            <option value="library">Library</option>
-            <option value="outdoor">Outside</option>
-            <option value="add new ...">Add new ...</option>
+            {placeTypeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
           <label htmlFor="travelMethodDropdown">Choose travel method:</label>
           <select
             value={travelMethod}
             name="travelMethodDropdown"
             id="travelMethodDropdown"
-            onChange={(e) => setTravelMethod(e.target.value)}
+            onChange={(e) =>
+              setTravelMethod(e.target.value as TravelMethod)
+            }
           >
-            <option value="walking">Walking</option>
-            <option value="bus">Bus</option>
-            <option value="train">Train</option>
-            <option value="add new ...">Add new ...</option>
+            {travelMethodOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
-          {/* TODO: Skru default travel time til mye mer, eller gi evne til å skru av å søke på traveltime.
-              Grunnen til dette er UX. Hvis brukeren ikke tenker på å søke med traveltime, så burde han/hun ikke trenge å justere på det.
-          */}
           <label htmlFor="maxTravelTimeInput">
             Maximum travel time in minutes
           </label>
